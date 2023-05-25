@@ -1,0 +1,8 @@
+requests
+pandas
+numpy
+statsmodels
+plotly
+jupyter_dash
+dash
+gunicorn
