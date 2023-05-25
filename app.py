@@ -59,4 +59,4 @@ def update_choropleth_map(selected_race):
     return fig
 
 # Run the app
-app.run_server(debug=True)
+app.run_server(mode='inline')
