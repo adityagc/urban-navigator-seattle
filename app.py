@@ -17,7 +17,22 @@ df = pd.read_csv(csv_file)
 # Select population columns
 population_columns = ['NAMELSAD10','TOTAL_POPULATION','WHITE', 'BLACK', 'AMER-INDIAN', 'ASIAN', 'HAWAIAN-PI', 'OTHER', 'TWO_OR_MORE_RACE', 'HISPANIC_OR_LATINO_OF_ANY_RACE']
 df_population = df[population_columns].copy()
-
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 328" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 327.02"]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 315.02" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 315.02" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 328" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 325" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 326.01" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 326.02" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 327.03" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 327.04" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 320.03" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 315.01" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 313.01" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 312.02" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 313.02" ]
+df_population = df_population[df_population.NAMELSAD10 != "Census Tract 314" ]
 # Display the first 6 rows of the new DataFrame
 # print(df_population.head(6))
 
@@ -58,7 +73,7 @@ app.layout = html.Div([
             html.Div([
                 dcc.Graph(id='choropleth-map-2'),
                 html.Div([
-                    html.P('Select a population race:'),
+                    html.P('Select a population demographic group:'),
                     dcc.RadioItems(
                         id='race-selector-2',
                         options=[{'label': race, 'value': race} for race in population_columns[1:]],
