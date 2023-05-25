@@ -58,7 +58,7 @@ app.layout = html.Div([
             html.Div([
                 dcc.Graph(id='choropleth-map-1'),
                 html.Div([
-                    html.P('Select a population race:'),
+                    html.P('Select a population demographic group:'),
                     dcc.RadioItems(
                         id='race-selector-1',
                         options=[{'label': race, 'value': race} for race in population_columns[1:]],
