@@ -51,7 +51,7 @@ app.layout = html.Div([
     html.H2(children='Explore Demographic Distribution',
              style={'text-align': 'center', 'margin-bottom': '13px', 'font-size': '20px', 'font-weight': 'bold'}),
     html.P(children='Click the radio buttons to visualize the population of each district based for that demographic group.'
-                    'For a more detailed break-down of each district, click on the district of interest visualize each group's relative contribution to the population demographics.',
+                    'Click on the district of interest visualize the relative contribution of each group to the population demographics.',
              style={'text-align': 'center', 'margin-bottom': '20px', 'font-size': '16px'}),
     dcc.Tabs(id='tabs', value='tab-1', children=[
         dcc.Tab(label='Tab 1', value='tab-1', children=[
