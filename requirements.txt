@@ -8,3 +8,4 @@ dash
 gunicorn
 json
 os
+Flask==2.2.0
