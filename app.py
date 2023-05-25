@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import json
+import os
 
 dirname = os.path.dirname(__file__)
 csv_file = os.path.join(dirname, 'census.csv')
