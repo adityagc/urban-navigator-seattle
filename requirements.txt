@@ -6,6 +6,4 @@ plotly
 jupyter_dash
 dash
 gunicorn
-json
-os
 Flask==2.2.0
