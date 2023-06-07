@@ -5,6 +5,7 @@ Meenal Rawlani
 Dorna Abdolazimi
 Prithviraj Chumble
 
+
 We are developing an interactive visualization tool primarily that includes a chloropleth map, scatter plots, box plots, pie charts, etc with the aim to illustrate the segregation and inequality present in Seattle's various neighborhoods, focusing on socio-economic factors and racial disparities. Our primary dataset for this visualization is census data, which provides a comprehensive overview of the city's population. Additionally, we plan to incorporate one or more supplementary datasets to enhance the depiction of specific aspects of inequality.
 The visualization begins by allowing users to select the aspect of inequality they wish to explore. This could include income disparities, education gaps, infrastructure discrepancies, and more. Upon selection, the tool displays primary visualizations related to the chosen aspect, providing users with a clear understanding of the overall patterns and trends.
 Users are then able to choose a specific demographic group, such as racial or ethnic categories, and observe its distribution on the map. This feature enables users to visualize the concentration and dispersion of different demographic groups across Seattle's neighborhoods.
