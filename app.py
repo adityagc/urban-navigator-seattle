@@ -760,4 +760,4 @@ def update_plots_education(select_data):
     
 
 if __name__ == '__main__':
-    app.run_server(mode='inline')
+    app.run_server()
