@@ -32,6 +32,7 @@ with open('A_Census_Tract_(2010)_Profile_ACS_5-year_Estimates_2013-2017.geojson'
 population_abs_columns = ['NAMELSAD10','TOTAL_POPULATION','WHITE',  'BLACK', 'AMER-INDIAN', 
  'ASIAN',   'HAWAIAN-PI', 'TWO_OR_MORE_RACE',  'HISPANIC_OR_LATINO_OF_ANY_RACE', 'OTHER']
 
+
 # Select population percentage columns
 population_columns = ['NAMELSAD10', 'PCT_WHITE','PCT_BLACK', 
 'PCT_AMER-INDIAN', 'PCT_ASIAN',   'PCT_HAWAIAN-PI','PCT_TWO_OR_MORE', 'PCT_HISP_ANY_RACE', 'PCT_OTHER']
@@ -180,7 +181,11 @@ fig_box_education.update_layout(title_font_size=16, legend_font_size=9, title_fo
 
 
 # Define the app layout
-app.layout = html.Div([dcc.Tabs(id='tabs', value='tab-1', children=[
+app.layout = html.Div([html.H1(children='Population Choropleth Map',
+             style={'text-align': 'center', 'margin-bottom': '10px', 'font-size': '28px', 'font-weight': 'bold'}),
+    html.H2(children='Explore Demographic Distribution',
+             style={'text-align': 'center', 'margin-bottom': '13px', 'font-size': '20px', 'font-weight': 'bold'}),
+             dcc.Tabs(id='tabs', value='tab-1', children=[
     dcc.Tab(label='Housing', value='tab-1', children=[
         html.Div([
             html.Div([
