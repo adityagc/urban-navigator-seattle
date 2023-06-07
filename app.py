@@ -181,9 +181,9 @@ fig_box_education.update_layout(title_font_size=16, legend_font_size=9, title_fo
 
 
 # Define the app layout
-app.layout = html.Div([html.H1(children='Population Choropleth Map',
+app.layout = html.Div([html.H1(children='Urban Navigator',
              style={'text-align': 'center', 'margin-bottom': '10px', 'font-size': '28px', 'font-weight': 'bold'}),
-    html.H2(children='Explore Demographic Distribution',
+    html.H2(children='Explore demographic distribution and inequality in Seattle',
              style={'text-align': 'center', 'margin-bottom': '13px', 'font-size': '20px', 'font-weight': 'bold'}),
              dcc.Tabs(id='tabs', value='tab-1', children=[
     dcc.Tab(label='Housing', value='tab-1', children=[
