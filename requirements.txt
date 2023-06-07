@@ -4,6 +4,6 @@ numpy
 statsmodels
 plotly==5.14.1
 jupyter_dash
-dash==2.10.2
+dash==2.10.0
 gunicorn
 Flask==2.2.0
