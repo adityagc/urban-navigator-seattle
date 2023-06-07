@@ -763,7 +763,7 @@
 #     app.run_server()
 
 
-mport plotly.express as px
+import plotly.express as px
 from dash import dcc, html
 import pandas as pd
 import dash
