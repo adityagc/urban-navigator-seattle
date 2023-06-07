@@ -8,11 +8,6 @@ import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import random 
-import os
-
-dirname = os.path.dirname(__file__)
-# csv_file = os.path.join(dirname, 'census.csv')
-geojson_file = os.path.join(dirname, 'A_Census_Tract_(2010)_Profile_ACS_5-year_Estimates_2013-2017.geojson')
 
 # Load Data
 df = pd.read_csv('A_Census_Tract_(2010)_Profile_ACS_5-year_Estimates_2013-2017.csv')
@@ -30,12 +25,13 @@ population_abs_columns = ['NAMELSAD10','TOTAL_POPULATION','WHITE',  'BLACK', 'AM
 df_abs_population = df[population_abs_columns].copy()
 
 # Load GeoJSON data
-with open(geojson_file) as file:
+with open('A_Census_Tract_(2010)_Profile_ACS_5-year_Estimates_2013-2017.geojson') as file:
     counties = json.load(file)
 
 # Select population columns
 population_abs_columns = ['NAMELSAD10','TOTAL_POPULATION','WHITE',  'BLACK', 'AMER-INDIAN', 
  'ASIAN',   'HAWAIAN-PI', 'TWO_OR_MORE_RACE',  'HISPANIC_OR_LATINO_OF_ANY_RACE', 'OTHER']
+
 
 
 # Select population percentage columns
@@ -67,8 +63,23 @@ columns_to_multiply = ['PCT_ADULT_NOLEISUREPHYSACTIV', 'PCT_ADULT_WITH_DIABETES'
 
 df_health.loc[:, columns_to_multiply] *= 100
 
-# Display the first 6 rows of the new DataFrame
 
+# Select income and housing columns
+degree_columns = ['NAMELSAD10', 'PCNT_HIGHSCHOOL_GRAD_OR_HIGHER', 'PCT_BACHELOR_DEGREE_OR_HIGHER' ]
+df_degree = df[degree_columns].copy()
+degree_columns2 = ['NAMELSAD10', 'PCT_BACHELOR_DEGREE_OR_HIGHER' ]
+df_degree2 = df[degree_columns2].copy()
+
+#Dataframe for Summary Tab
+selected_columns = ['NAMELSAD10','PCT_BPOC', 'PCT_GRAPI_30','PCT_OWN_OCC_HU']
+health_tab_columns=['NAMELSAD10','SOCIOECON_DISADV_SCORE', 'HEALTH_DISADV_SCORE']
+health_df2=df_health[health_tab_columns]
+summary_df = df_income_housing[selected_columns]
+
+merged_df = summary_df.merge(health_df2, on='NAMELSAD10')
+merged_df = merged_df.merge(df_degree2, on='NAMELSAD10')
+merged_df['SOCIOECON_DISADV_SCORE'] = merged_df['SOCIOECON_DISADV_SCORE'] * 100
+merged_df['HEALTH_DISADV_SCORE'] = merged_df['HEALTH_DISADV_SCORE'] * 100
 df_school_ass = pd.read_csv('Report_Card_Assessment_Data_2017-18_School_Year.csv')
 df_school_teach = pd.read_csv('Report_Card_Teacher_Ratio_Program_Certificate_2017-18_School_Year.csv')
 df_school_sites = pd.read_csv('School_Sites_in_King_County___schsite_point.csv')
@@ -81,8 +92,36 @@ df_school_exp= pd.read_csv('expenditure.csv')
 df_school_pov = df_school_pov[df_school_pov.DistrictName =='Seattle']
 df_school_exp = df_school_exp[df_school_exp.DistrictName =='Seattle School District #1']
 df_school_exp = df_school_exp[df_school_exp.OrganizationalLevel =='School']
-df_school_exp = df_school_exp[df_school_exp.Activity =='Instruction']
 df_school_exp = df_school_exp[df_school_exp.Source =='State/Local']
+
+
+
+
+
+
+df_school_exp= df_school_exp.groupby('SchoolName')['Expenditure'].sum()
+
+
+
+
+
+#df_school_exp3 = df_school_exp[df_school_exp.Activity =='Pupil Transportation'][exp_columns]
+#df_school_exp4 = df_school_exp[df_school_exp.Activity =='Maintenance and Operations'][exp_columns]
+#df_school_exp5 = df_school_exp[df_school_exp.Activity =='Other Service'][exp_columns]
+#df_school_exp6 = df_school_exp[df_school_exp.Activity =='Public Actives'][exp_columns]
+#df_school_exp7 = df_school_exp[df_school_exp.Activity =='Personnel'][exp_columns]
+
+
+
+
+
+
+
+
+
+
+
+
 df_school_ass = df_school_ass[df_school_ass.GradeLevel =='All Grades']
 df_school_ass = df_school_ass[df_school_ass.StudentGroup =='All Students']
 df_school_ass = df_school_ass[df_school_ass.DistrictName =='Seattle School District No. 1']
@@ -145,6 +184,48 @@ df_school = pd.merge(df_school, df_poc_temp, how='inner', on=['NAMELSAD10'])
 
 
 
+#print(df_school.head(5))
+
+
+
+
+
+
+#df_school_sites = df_school_sites[df_school_sites.DISTRICT =='SEATTLE']
+
+
+
+
+
+# temp3 = df_school_pov ['SchoolName'].tolist()
+# temp3 = set(temp3)
+# print(len(temp3))
+
+
+
+
+                
+#print(len(school_names))            
+
+#school_geoid ={}
+#for name in school_names.keys():
+ #   row=df_school_sites.loc[df_school_sites['SchoolName']==school_names[name]]
+ #   X = row['X'].tolist()[0]
+#    Y=  row['Y'].tolist()[0]
+#    url = 'https://geocoding.geo.census.gov/geocoder/geographies/coordinates?x='+str(X)+'&y='+str(Y)+'&benchmark=Public_AR_Current&vintage=Census2010_Current&format=json'
+#    response = urlopen(url)
+ #   data_json = json.loads(response.read())
+  #  school_geoid [name] = data_json["result"]['geographies']["Census Tracts"][0]['GEOID']
+    #print (  school_geoid [name])
+#print (school_geoid)
+
+#school_geoid= {'North Beach Elementary School': 'Census Tract 16', 'Seattle World School': 'Census Tract 79', 'Whitman Middle School': 'Census Tract 16', 'Chief Sealth International High School': 'Census Tract 114.01', 'Dunlap Elementary School': 'Census Tract 118', 'Bailey Gatzert Elementary School': 'Census Tract 90', 'Bryant Elementary School': 'Census Tract 42', 'West Seattle Elementary School': 'Census Tract 97.02', 'Private School Services': 'Census Tract 93', 'Laurelhurst Elementary School': 'Census Tract 41', 'Green Lake Elementary School': 'Census Tract 36', 'Viewlands Elementary School': 'Census Tract 36', 'Bridges Transition': 'Census Tract 89', 'Licton Springs K-8': 'Census Tract 32', 'Genesee Hill Elementary': 'Census Tract 97.02', 'Leschi Elementary School': 'Census Tract 78', 'John Hay Elementary School': 'Census Tract 68', 'Hamilton International Middle School': 'Census Tract 50', 'John Rogers Elementary School': 'Census Tract 8', 'Roxhill Elementary School': 'Census Tract 115', 'Maple Elementary School': 'Census Tract 93', 'McDonald International School': 'Census Tract 45', 'Gatewood Elementary School': 'Census Tract 106', 'Wing Luke Elementary School': 'Census Tract 117', 'Ingraham High School': 'Census Tract 6', 'Eckstein Middle School': 'Census Tract 38', 'Cascade Parent Partnership Program': 'Census Tract 36', 'Rainier View Elementary School': 'Census Tract 119', 'Ballard High School': 'Census Tract 33', 'Fairmount Park Elementary School': 'Census Tract 105', 'Lafayette Elementary School': 'Census Tract 98', 'Louisa Boren STEM K-8': 'Census Tract 108', 'Tops K-8 School': 'Census Tract 61', 'Mercer International Middle School': 'Census Tract 100.01', 'B F Day Elementary School': 'Census Tract 49', 'Alki Elementary School': 'Census Tract 97.01', 'Cleveland High School STEM': 'Census Tract 104.02', 'Washington Middle School': 'Census Tract 90', 'Garfield High School': 'Census Tract 88', 'The Center School': 'Census Tract 71', 'West Seattle High School': 'Census Tract 98', 'View Ridge Elementary School': 'Census Tract 39', 'Greenwood Elementary School': 'Census Tract 29', 'Daniel Bagley Elementary School': 'Census Tract 27', 'Madison Middle School': 'Census Tract 97.02', 'Olympic View Elementary School': 'Census Tract 19', 'Kimball Elementary School': 'Census Tract 110.02', 'Arbor Heights Elementary School': 'Census Tract 120', 'Concord International School': 'Census Tract 112', 'Franklin High School': 'Census Tract 95', 'Orca K-8 School': 'Census Tract 103', 'Lawton Elementary School': 'Census Tract 58.01', 'Jane Addams Middle School': 'Census Tract 10', 'Whittier Elementary School': 'Census Tract 30', 'Catharine Blaine K-8 School': 'Census Tract 57', 'McClure Middle School': 'Census Tract 68', 'Sacajawea Elementary School': 'Census Tract 20', 'Dearborn Park International School': 'Census Tract 104.01', 'Sand Point Elementary': 'Census Tract 41', 'Thurgood Marshall Elementary': 'Census Tract 95', 'Stevens Elementary School': 'Census Tract 64', 'Salmon Bay K-8 School': 'Census Tract 33', 'Interagency Open Doors': 'Census Tract 103', 'Adams Elementary School': 'Census Tract 32', 'David T. Denny International Middle School': 'Census Tract 114.01', 'Thornton Creek Elementary School': 'Census Tract 24', 'Loyal Heights Elementary School': 'Census Tract 31', 'Aki Kurose Middle School': 'Census Tract 103', 'Broadview-Thomson K-8 School': 'Census Tract 4.01', 'Emerson Elementary School': 'Census Tract 118', 'John Stanford International School': 'Census Tract 52', 'Pathfinder K-8 School': 'Census Tract 99', 'Queen Anne Elementary': 'Census Tract 67', 'Martin Luther King Jr. Elementary School': 'Census Tract 111.01', 'Roosevelt High School': 'Census Tract 26', 'Sanislo Elementary School': 'Census Tract 108', 'Highland Park Elementary School': 'Census Tract 113', 'Rainier Beach High School': 'Census Tract 118', 'Cascadia Elementary': 'Census Tract 50', 'Lowell Elementary School': 'Census Tract 65', 'Beacon Hill International School': 'Census Tract 94', 'Graham Hill Elementary School': 'Census Tract 111.02', 'Middle College High School': 'Census Tract 19', 'Northgate Elementary School': 'Census Tract 6', 'South Shore PK-8 School': 'Census Tract 118', 'Montlake Elementary School': 'Census Tract 62', 'McGilvra Elementary School': 'Census Tract 63', 'Nova High School': 'Census Tract 88', 'Hazel Wolf K-8': 'Census Tract 6', 'West Woodland Elementary School': 'Census Tract 34', 'John Muir Elementary School': 'Census Tract 95', 'Olympic Hills Elementary School': 'Census Tract 2', 'Frantz Coe Elementary School': 'Census Tract 59', 'Nathan Hale High School': 'Census Tract 10'}
+#school_tract = {}
+#for name in school_geoid.keys():
+ #   school_tract[name] = df_census_tract_geoid.loc[df_census_tract_geoid['GEOID10']==int(school_geoid[name])]['NAMELSAD10'].tolist()[0]
+
+#print (school_tract)
+
 
 # Initialize the Dash app
 app = dash.Dash(__name__)
@@ -160,37 +241,128 @@ fig_scatter_housing = px.scatter(df_income_housing, x='MEDIAN_HH_INC_PAST_12MO_D
 fig2_scatter_housing = px.scatter(df_income_housing, x='HU_VALUE_MEDIAN_DOLLARS', y='PCT_OWN_OCC_HU', color='PCT_BPOC', opacity=0.3,  color_continuous_scale='matter')
 
 
-fig_box_education = px.scatter(df_income_housing, x='HU_VALUE_MEDIAN_DOLLARS', y='PCT_OWN_OCC_HU', color='PCT_BPOC', opacity=0.3,  color_continuous_scale='matter')
-df_school_1 = df_school[df_school['TestSubject']=='ELA']
-df_school_2 = df_school[df_school['TestSubject']=='Math']
-fig_scatter_education= px.scatter(df_school_1, x='Expenditure', trendline='ols',y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter')
-fig_scatter_education2= px.scatter(df_school_2, x='Expenditure', trendline='ols',y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter')
+df_school_1 = df_school[df_school['TestSubject']=='ELA'][['SchoolName', 'Expenditure', 'PercentMetStandard', 'PCT_BPOC','Homeless', 'Poverty - 10/1/2016']]
+df_school_2 = df_school[df_school['TestSubject']=='Math'][['SchoolName','Expenditure', 'PercentMetStandard', 'PCT_BPOC', 'Homeless', 'Poverty - 10/1/2016']]
+
+
+
+
+ # Box plot
+factors = ['PCNT_HIGHSCHOOL_GRAD_OR_HIGHER', 'PCT_BACHELOR_DEGREE_OR_HIGHER']
+labels = {
+    'PCNT_HIGHSCHOOL_GRAD_OR_HIGHER': 'High School or Higher',
+    'PCT_BACHELOR_DEGREE_OR_HIGHER': 'Bachelor or Higher',
+   
+}
+fig_box_education = px.box(df_degree, y=factors, labels={'value': 'Percentage'}, points=False )
+
+fig_box_education.update_xaxes(
+    tickmode='array',
+    tickvals=factors,
+    ticktext=[labels[factor] for factor in factors], 
+    tickangle=-45
+)
+
+fig_scatter_education= px.scatter(df_school_1, x='Expenditure', y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter', hover_name= 'SchoolName')
+fig_scatter_education2= px.scatter(df_school_2, x='Expenditure', y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter', hover_name= 'SchoolName')
 
 #fig_scatter_education.update_layout(coloraxis=dict(colorscale='matter'))
+
+
+fig_scatter_housing.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima', width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0},
+                      xaxis_title="Median Income of District in a Year",
+                      yaxis_title="Pct. of Households With GRAPI > 30")
+fig_scatter_housing.update_coloraxes(colorbar_thickness=15,  colorbar_title="Percentage of BIPOC" ) 
+
+fig2_scatter_housing.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima', width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0},
+                       xaxis_title="Median House Unit value",
+                       yaxis_title="Pct. of Houses Occupied by Owners")
+fig2_scatter_housing.update_coloraxes(colorbar_thickness=15,  colorbar_title="Percentage of BIPOC" ) 
+
+
+
+fig_scatter_health.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima',
+                              xaxis_title='Socioeconomic Disadvantage Score',
+                              yaxis_title='Health Disadvantage Score',
+                              width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
+fig_scatter_health.update_coloraxes(colorbar_thickness=15, colorbar_title='Percentage of BIPOC')
+fig_box_health.update_layout(font_size=10,font_family='Optima',  title_font_size=16, legend_font_size=9, title_font_family='Optima',
+                         width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
 
 
 
 fig_scatter_education.update_coloraxes(showscale=False)
 
-fig_scatter_education.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+fig_scatter_education.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima',
                               xaxis_title='Expenditure per Student',
                               yaxis_title='Pct. of Students Who Passed SBAC ELA Test',
                               width=230, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
-fig_scatter_education2.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+fig_scatter_education2.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima',
                               xaxis_title='Expenditure per Student',
                               yaxis_title='Pct. of Students Who Passed SBAC Math Test',
                               width=400, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
 fig_scatter_education2.update_coloraxes(colorbar_thickness=15, colorbar_title='Percentage of BIPOC')
-fig_box_education.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+fig_box_education.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima',
                          width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
 
 
+
+
+ 
+    # Box plot
+factors = ['PCT_GRAPI_30', 'PCT_BACHELOR_DEGREE_OR_HIGHER', 'PCT_OWN_OCC_HU', 'SOCIOECON_DISADV_SCORE', 'HEALTH_DISADV_SCORE']
+labels = {
+        'PCT_BACHELOR_DEGREE_OR_HIGHER': 'Bachelor or Higher',
+        'PCT_GRAPI_30': 'GRAPI>30',
+        'PCT_OWN_OCC_HU':'% of Houses Occupied by Owners', 
+        'SOCIOECON_DISADV_SCORE': 'Socioeconomic Disadvantage Score',
+        'HEALTH_DISADV_SCORE': 'Health Disadvantage Score'
+   
+}
+fig_box_s = px.box(merged_df, y=factors, labels={'value': 'Percentage'}, points=False )
+
+fig_box_s.update_xaxes(
+        tickmode='array',
+        tickvals=factors,
+        ticktext=[labels[factor] for factor in factors], 
+        tickangle=-45
+)
+selected_geoids = []
+og_geoids=merged_df['NAMELSAD10'].tolist()
+fig_s=go.Figure()
+selected_df = merged_df[merged_df['NAMELSAD10'].isin(og_geoids)]
+mean_values = []
+
+for column in selected_df.columns[2:]:
+        mean_value = selected_df[column].mean()
+        mean_values.append(mean_value)
+    
+
+if not selected_df.empty:
+        fig_s.add_trace(go.Scatterpolar(
+                    r=mean_values,
+                    theta=["% GRAPI >30", "% Owner Occupied Houses","Socioeconomic Disadvantage","Health Disadvantage", "% Bachelor or Higher"],
+                    fill='none',
+                    name="",
+                    showlegend=False,opacity=1,line_width=10
+))
+
+fig_s.update_layout(
+        font_size=10,font_family='Optima',
+        polar=dict(radialaxis=dict(visible=True)),
+        showlegend=True,
+        width=450,
+        height=300,
+        margin={"r": 0, "t": 50, "l": 100, "b": 50},
+        autosize=False
+    )
+fig_s.update_polars(radialaxis_range=[0,100])
+fig_box_s.update_layout(font_size=10,font_family='Optima',title_font_size=16, legend_font_size=9, title_font_family='Optima',
+                         width=500, height=300, margin={"r": 0, "t": 50, "l": 0, "b": 0})
+
 # Define the app layout
-app.layout = html.Div([html.H1(children='Urban Navigator',
-             style={'text-align': 'center', 'margin-bottom': '10px', 'font-size': '28px', 'font-weight': 'bold'}),
-    html.H2(children='Explore demographic distribution and inequality in Seattle',
-             style={'text-align': 'center', 'margin-bottom': '13px', 'font-size': '20px', 'font-weight': 'bold'}),
-             dcc.Tabs(id='tabs', value='tab-1', children=[
+app.layout = html.Div([ html.H1(children='Mapping Segregation and Inequality in Seattle',
+             style={'text-align': 'center', 'margin-bottom': '10px', 'font-size': '28px', 'font-weight': 'bold', 'font-family': 'Optima'}), dcc.Tabs(id='tabs', value='tab-1', children=[
     dcc.Tab(label='Housing', value='tab-1', children=[
         html.Div([
             html.Div([
@@ -228,7 +400,7 @@ app.layout = html.Div([html.H1(children='Urban Navigator',
                     dcc.Graph(id="HU-price-owner-occupied-scatter-plot", figure=fig2_scatter_housing),
                 ])
             ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '0px'}),
-        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px'})
+        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px', 'justify-content': 'space-around'})
      ]),   
     dcc.Tab(label='Health', value='tab-2', children=[
         html.Div([
@@ -268,7 +440,7 @@ app.layout = html.Div([html.H1(children='Urban Navigator',
                   
                 ])
             ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '0px'}),
-        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px'})
+        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px', 'justify-content': 'space-around'})
     ]),
     dcc.Tab(label='Education', value='tab-3', children=[
         html.Div([
@@ -312,7 +484,7 @@ app.layout = html.Div([html.H1(children='Urban Navigator',
                   
                 ])
             ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '0px'}),
-        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px'})
+        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px', 'justify-content': 'space-around'})
     ]),
     dcc.Tab(label='Summary', value='tab-4', children=[
         html.Div([
@@ -344,19 +516,18 @@ app.layout = html.Div([html.H1(children='Urban Navigator',
             ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '0px'}),
             html.Div([
                 html.Div([
-                    dcc.Graph(id="radar-plot-summary"),
+                    dcc.Graph(id="radar-plot-summary", figure = fig_s),
                    
                 ]),
                 html.Div([
-                    dcc.Graph(id="box-plot-summary"),
+                    dcc.Graph(id="box-plot-summary", figure = fig_box_s),
                   
-                ])
+                ], style={'width': '80%'})
             ], style={'display': 'flex', 'flex-direction': 'column', 'gap': '0px'}),
-        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px'})
+        ], style={'display': 'flex', 'flex-direction': 'row', 'gap': '0px', 'justify-content': 'space-around'})
     ])
   ])
 ])
-
 
 # Function to update the choropleth map in Tab 1
 @app.callback(
@@ -461,7 +632,8 @@ def update_scatter(select_data): #click_data is for clicking on a single distric
             x=selected_df['MEDIAN_HH_INC_PAST_12MO_DOLLAR'],
             y=selected_df['PCT_GRAPI_30'],
             mode='markers',
-            marker=dict(color=selected_df['PCT_BPOC'], opacity=selected_opacity, size = 10, colorscale='matter')
+            marker=dict(color=selected_df['PCT_BPOC'], opacity=selected_opacity, size = 10, colorscale='matter'),
+            showlegend=False
         ))
         
     if selected_geoids:
@@ -470,27 +642,26 @@ def update_scatter(select_data): #click_data is for clicking on a single distric
             x=selected_df['HU_VALUE_MEDIAN_DOLLARS'],
             y=selected_df['PCT_OWN_OCC_HU'],
             mode='markers',
-            marker=dict(color=selected_df['PCT_BPOC'], opacity=selected_opacity, size = 10, colorscale='matter')
+            marker=dict(color=selected_df['PCT_BPOC'], opacity=selected_opacity, size = 10, colorscale='matter'),
+            showlegend=False
         ))
 
 
 
-    fig.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima', width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0},
-                      xaxis_title="Median income of district in a year",
-                      yaxis_title="Pct. of households with GRAPI > 30")
+    fig.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima', width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0},
+                      xaxis_title="Median Income of District in a Year",
+                      yaxis_title="Pct. of Households With GRAPI > 30")
     fig.update_coloraxes(colorbar_thickness=15,  colorbar_title="Percentage of BIPOC" ) 
 
-    
-    
-    fig2.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima', width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0},
-                       xaxis_title="Median house unit value",
-                       yaxis_title="Pct. of houses occupied by owners")
+    fig2.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima', width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0},
+                       xaxis_title="Median House Unit value",
+                       yaxis_title="Pct. of Houses Occupied by Owners")
     fig2.update_coloraxes(colorbar_thickness=15,  colorbar_title="Percentage of BIPOC" ) 
 
 
+
+
     return fig, fig2
-
-
 
 # Function to update the choropleth map in Tab b
 @app.callback(
@@ -515,6 +686,21 @@ def update_choropleth_map_2(selected_race):
     return fig
 
 
+# def update_choropleth_map_2(selected_race):
+#     selected_race.append('NAMELSAD10')
+#     df_population['Percentage'] = round(df_population [selected_race].sum(axis=1), 0)
+#     fig = px.choropleth(df_population, geojson=counties, color=df_population['Percentage'],
+#                         color_continuous_scale='deep', 
+#                         range_color=(min(df_population['Percentage'])-1,max(df_population['Percentage'])),
+#                         locations=df_population['NAMELSAD10'], featureidkey="properties.NAMELSAD10",
+#                         projection="mercator")
+#     fig.update_geos(fitbounds="locations", visible=False)
+#     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},width=450, height = 320, margin_pad=0)
+#     fig.update_layout(modebar_remove=['pan', 'select2d', 'toImage', 'zoomIn', 'zoomOut', 'autoScale','resetGeo', 'resetViewMapbox'], modebar_activecolor= 'red', modebar_color='#FF8A8A')
+#     fig.update_coloraxes(colorbar_thickness=10, colorbar_len=0.5, colorbar_dtick =10 ) 
+#     fig.update_layout(clickmode='event+select')
+    
+#     return fig
 
 # Function to update the pie chart in based on one selected district
 @app.callback(
@@ -637,20 +823,18 @@ def update_plots(select_data):
 
             fig_box.add_trace(factor_trace)
 
-    fig_scatter.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+    fig_scatter.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima',
                               xaxis_title='Socioeconomic Disadvantage Score',
                               yaxis_title='Health Disadvantage Score',
                               width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
     fig_scatter.update_coloraxes(colorbar_thickness=15, colorbar_title='Percentage of BIPOC')
-    fig_box.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+    fig_box.update_layout(font_size=10,font_family='Optima', title_font_size=16, legend_font_size=9, title_font_family='Optima',
                          width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
 
     return fig_scatter, fig_box
     
 
-
-
-# Function to update the choropleth map in Tab 
+# Function to update the choropleth map in Education Tab
 @app.callback(
     Output('choropleth-map-3', 'figure'),
     Input('race-selector-3', 'value')
@@ -728,41 +912,352 @@ def update_pie_chart_3(select_data):
 
 # Function to update the scatter plot and box plot
 @app.callback(
-    [Output('scatter-plot-education', 'figure'), Output('box-plot-e', 'figure')],
+    [Output('scatter-plot-education', 'figure'), Output('scatter-plot-education2', 'figure'),Output('box-plot-education', 'figure')],
    Input('choropleth-map-3', 'selectedData')
 )
 def update_plots_education(select_data):
     
-    fig_box_education = px.scatter(df_income_housing, x='HU_VALUE_MEDIAN_DOLLARS', y='PCT_OWN_OCC_HU', color='PCT_BPOC', opacity=0.3,  color_continuous_scale='matter')
     df_school_1 = df_school[df_school['TestSubject']=='ELA']
     df_school_2 = df_school[df_school['TestSubject']=='Math']
-    fig_scatter_education= px.scatter(df_school_1, x='Expenditure', trendline='ols',y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter')
-    fig_scatter_education2= px.scatter(df_school_2, x='Expenditure', trendline='ols',y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter')
+    fig_scatter_education= px.scatter(df_school_1, x='Expenditure',y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter', hover_name= 'SchoolName')
+    fig_scatter_education2= px.scatter(df_school_2, x='Expenditure',y='PercentMetStandard', color='PCT_BPOC', opacity=0.3,   color_continuous_scale='matter', hover_name= 'SchoolName')
+    # Box plot
+    factors = ['PCNT_HIGHSCHOOL_GRAD_OR_HIGHER', 'PCT_BACHELOR_DEGREE_OR_HIGHER']
+    labels = {
+        'PCNT_HIGHSCHOOL_GRAD_OR_HIGHER': 'High School or Higher',
+        'PCT_BACHELOR_DEGREE_OR_HIGHER': 'Bachelor or Higher',
+   
+    }
+    fig_box_education = px.box(df_degree, y=factors, labels={'value': 'Percentage'}, points=False )
+
+    fig_box_education.update_xaxes(
+        tickmode='array',
+        tickvals=factors,
+        ticktext=[labels[factor] for factor in factors], 
+        tickangle=-45
+    )
+    
+
+
+
+    selected_opacity = 1.0
+    unselected_opacity = 0.3
+
+    selected_geoids = []
+
+
+
+    if select_data is not None:
+        selected_geoids.extend([point['location'] for point in select_data['points']])
+
+    if selected_geoids:
+        selected_df = df_school_1[df_school_1['NAMELSAD10'].isin(selected_geoids)]
+        print(selected_df)
+        fig_scatter_education.add_trace(go.Scatter(
+            x=selected_df['Expenditure'],
+            y=selected_df['PercentMetStandard'],
+            mode='markers',
+            marker=dict(color=selected_df['PCT_BPOC'], opacity=selected_opacity, size = 10, colorscale='matter'),
+            showlegend=False
+        ))
+        
+    if selected_geoids:
+        selected_df = df_school_2[df_school_2['NAMELSAD10'].isin(selected_geoids)]
+        fig_scatter_education2.add_trace(go.Scatter(
+           x=selected_df['Expenditure'],
+            y=selected_df['PercentMetStandard'],
+            mode='markers',
+            marker=dict(color=selected_df['PCT_BPOC'], opacity=selected_opacity, size = 10, colorscale='matter'),
+            showlegend=False
+        ))
+    if selected_geoids:
+        selected_df = df_degree[df_degree['NAMELSAD10'].isin(selected_geoids)]
+
+
+        # Add a single point to the box plot for each selected district
+        for i, district_geoid in enumerate(selected_geoids):
+            district_data = df_degree[df_degree['NAMELSAD10'] == district_geoid]
+            #color = colors[i]
+
+            # Create a trace for all factors within the selected district
+            factor_trace = go.Scatter(
+                x=factors,
+                y=district_data[factors].values[0],
+                mode='markers',
+                marker=dict(color='red', size=4),
+                text = '',
+                name = '',
+                hovertemplate =str(district_geoid),  showlegend=False)
+            
+
+            fig_box_education.add_trace(factor_trace)
 
     
     fig_scatter_education.update_coloraxes(showscale=False)
 
-    fig_scatter_education.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+    fig_scatter_education.update_layout(font_size=10,font_family='Optima',title_font_size=16, legend_font_size=9, title_font_family='Optima',
                               xaxis_title='Expenditure per Student',
                               yaxis_title='Pct. of Students Who Passed SBAC ELA Test',
                               width=230, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
-    fig_scatter_education2.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+    fig_scatter_education2.update_layout(font_size=10,font_family='Optima',title_font_size=16, legend_font_size=9, title_font_family='Optima',
                               xaxis_title='Expenditure per Student',
                               yaxis_title='Pct. of Students Who Passed SBAC Math Test',
                               width=400, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
     fig_scatter_education2.update_coloraxes(colorbar_thickness=15, colorbar_title='Percentage of BIPOC')
-    fig_box.update_layout(title_font_size=16, legend_font_size=9, title_font_family='Optima',
+    
+    fig_box_education.update_layout(font_size=10,font_family='Optima',title_font_size=16, legend_font_size=9, title_font_family='Optima',
                          width=500, height=300, margin={"r": 0, "t": 10, "l": 0, "b": 0})
 
 
 
 
+    return fig_scatter_education,fig_scatter_education2, fig_box_education
+    
+@app.callback(
+    Output('choropleth-map-4', 'figure'),
+    Input('race-selector-4', 'value')
+)
+def update_choropleth_map_4(selected_race):
+    selected_race.append('NAMELSAD10')
+    df_health['Percentage'] = round(df_health [selected_race].sum(axis=1), 0)
+    fig = px.choropleth(df_health, geojson=counties, color=df_health['Percentage'],
+                        color_continuous_scale='deep', 
+                        range_color=(min(df_health['Percentage'])-1,max(df_health['Percentage'])),
+                        locations=df_health['NAMELSAD10'], featureidkey="properties.NAMELSAD10",
+                        projection="mercator")
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0},width=450, height = 320, margin_pad=0)
+    fig.update_layout(modebar_remove=['pan', 'select2d', 'toImage', 'zoomIn', 'zoomOut', 'autoScale','resetGeo', 'resetViewMapbox'], modebar_activecolor= 'red', modebar_color='#FF8A8A')
+    fig.update_coloraxes(colorbar_thickness=10, colorbar_len=0.5, colorbar_dtick =10 ) 
+    fig.update_layout(clickmode='event+select')
+    
+    return fig
 
 
 
-  
-    return fig_scatter_education, fig_box_education
+@app.callback(
+    Output('population-pie-4', 'figure'),
+    [Input('choropleth-map-4', 'clickData'), Input('choropleth-map-4', 'selectedData')]
+)
+def update_pie_chart_4(click_data, select_data):
+    if click_data is None and select_data is None:
+        # If no district is selected, show an empty pie chart
+        fig = go.Figure(data=go.Pie())
+    elif click_data is not None:
+        district_name = click_data['points'][0]['location']
+        district_data = df_population[df_population['NAMELSAD10'] == district_name]
+        if not district_data.empty:
+            fig = go.Figure(data=go.Pie(
+                values=district_data[population_columns[1:]].values[0],
+                labels=['White',  'Black Non-Hispanic', 'Indegenous', 'Asian', 'Pacific Islander', 'Multiracial', 'Latinx', 'Other'],
+                marker=dict(
+                    colors=['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#808080']  # Fixed colors for each category
+                )
+            ))
+        else:
+            # If no data is available for the selected district, show an empty pie chart
+            fig = go.Figure(data=go.Pie())
+    else:
+        temp_list = []
+        for point in select_data['points']:
+            temp_list.append(point['location'])
+        district_data = df_abs_population[df_abs_population['NAMELSAD10'].isin(temp_list)]
+        district_data = district_data.drop(columns='NAMELSAD10')
+        if not district_data.empty:
+            district_data_sum = district_data.sum()
+            total_pop = district_data_sum['TOTAL_POPULATION']
+            temp_array = np.array([
+                district_data_sum['WHITE'] / total_pop,
+                district_data_sum['BLACK'] / total_pop,
+                district_data_sum['AMER-INDIAN'] / total_pop,
+                district_data_sum['ASIAN'] / total_pop,
+                district_data_sum['HAWAIAN-PI'] / total_pop,
+                district_data_sum['TWO_OR_MORE_RACE'] / total_pop,
+                district_data_sum['HISPANIC_OR_LATINO_OF_ANY_RACE'] / total_pop,
+                district_data_sum['OTHER'] / total_pop
+            ])
+            fig = go.Figure(data=go.Pie(
+                values=temp_array,
+                labels=['White',  'Black Non-Hispanic', 'Indegenous', 'Asian', 'Pacific Islander', 'Multiracial', 'Latinx', 'Other'],
+                #title="Population Distribution in Selected Census Tracts",
+                marker=dict(
+                    colors=['#FF6347', '#A52A2A', '#1E90FF', '#66CDAA', '#BA55D3', '#9ACD32', '#FFD700', '#4B0082']  # Fixed colors for each category
+                ),
+                #textfont_size=8,
+                textinfo='none'
+                
+            ))
+        else:
+            # If no data is available for the selected district, show an empty pie chart
+            fig = go.Figure(data=go.Pie())
+    fig.update_layout(
+        title_font_size=16,
+        legend_font_size=9,
+        title_font_family='Optima',
+        width=300,
+        height=300,
+        margin={"r": 20, "t": 0, "l": 0, "b": 0},
+        autosize=False
+    )
+
+    return fig
+# @app.callback(
+#     Output('radar-plot-summary', 'figure'),
+#     [Input('choropleth-map-4', 'clickData'), Input('choropleth-map-4', 'selectedData')]
+# )
+# def update_radar(click_data, select_data):
+#     selected_geoids = []
+
+#     if click_data is not None:
+#         district_geoid = click_data['points'][0]['location']
+#         selected_geoids.append(district_geoid)
+
+#     if select_data is not None:
+#         selected_geoids.extend([point['location'] for point in select_data['points']])
+
+#     if selected_geoids:
+#         selected_df = summary_df[summary_df['NAMELSAD10'].isin(selected_geoids)]
+#         if not selected_df.empty:
+#             for geoid in selected_geoids:
+#                 data = dict(
+#                     r=[selected_df['PCT_GRAPI_30'].values[geoid], selected_df['PCT_OWN_OCC_HU'].values[geoid]],
+#                     theta=["% GRAPI >30", "% OWN OCC HU"]
+#                 )
+#                 fig = px.line_polar(data, r='r', theta='theta', line_close=True)
+#             else:
+#                 # If no data is available for the selected district(s), show an empty radar chart
+#                 fig = go.Figure(data=go.Scatterpolar())
+#         else:
+#             # If no district is selected, show an empty radar chart
+#             fig = go.Figure(data=go.Scatterpolar())
+        
+          
+
+#     fig.update_layout(
+#         polar=dict(radialaxis=dict(visible=True)),
+#         showlegend=False,
+#         width=300,
+#         height=300,
+#         margin={"r": 20, "t": 0, "l": 0, "b": 0},
+#         autosize=False
+#     )
+
+#     return fig
+
+@app.callback(
+    [Output('radar-plot-summary', 'figure'),  Output('box-plot-summary', 'figure')],
+    [Input('choropleth-map-4', 'clickData'), Input('choropleth-map-4', 'selectedData')]
+)
+def update_radar(click_data, select_data):
+    
+    
+    # Box plot
+    factors = ['PCT_GRAPI_30', 'PCT_BACHELOR_DEGREE_OR_HIGHER', 'PCT_OWN_OCC_HU', 'SOCIOECON_DISADV_SCORE', 'HEALTH_DISADV_SCORE']
+    labels = {
+        'PCT_BACHELOR_DEGREE_OR_HIGHER': 'Bachelor or Higher',
+        'PCT_GRAPI_30': 'GRAPI>30',
+        'PCT_OWN_OCC_HU':'% of Houses Occupied by Owners', 
+        'SOCIOECON_DISADV_SCORE': 'Socioeconomic Disadvantage Score',
+        'HEALTH_DISADV_SCORE': 'Health Disadvantage Score'
+   
+    }
+    fig_box_education = px.box(merged_df, y=factors, labels={'value': 'Percentage'}, points=False )
+
+    fig_box_education.update_xaxes(
+        tickmode='array',
+        tickvals=factors,
+        ticktext=[labels[factor] for factor in factors], 
+        tickangle=-45
+    )
+    selected_geoids = []
+    og_geoids=merged_df['NAMELSAD10'].tolist()
+    fig=go.Figure()
+    selected_df = merged_df[merged_df['NAMELSAD10'].isin(og_geoids)]
+    mean_values = []
+
+    for column in selected_df.columns[2:]:
+        mean_value = selected_df[column].mean()
+        mean_values.append(mean_value)
     
 
+    if not selected_df.empty:
+        fig.add_trace(go.Scatterpolar(
+                    r=mean_values,
+                    theta=["% GRAPI >30", "% Owner Occupied Houses","Socioeconomic Disadvantage","Health Disadvantage", "% Bachelor or Higher"],
+                    fill='none',
+                    name="",
+                    showlegend=False,opacity=1,line_width=10
+        ))
+
+
+    if click_data is not None:
+        district_geoid = click_data['points'][0]['location']
+        selected_geoids.append(district_geoid)
+
+    if select_data is not None:
+        selected_geoids.extend([point['location'] for point in select_data['points']])
+
+     # Initialize an empty figure
+
+    if selected_geoids:
+        selected_df = merged_df[merged_df['NAMELSAD10'].isin(selected_geoids)]
+        if not selected_df.empty:
+            for geoid in selected_geoids:  
+#                 data = dict(
+#                     r=[selected_df.loc[selected_df['NAMELSAD10'] == geoid, 'PCT_GRAPI_30'].values[0],
+#                        selected_df.loc[selected_df['NAMELSAD10'] == geoid, 'PCT_OWN_OCC_HU'].values[0]],
+#                     theta=["% GRAPI >30", "% OWN OCC HU"]
+#                 )
+                fig.add_trace(go.Scatterpolar(
+                    r=[selected_df.loc[selected_df['NAMELSAD10'] == geoid, 'PCT_GRAPI_30'].values[0],
+                       selected_df.loc[selected_df['NAMELSAD10'] == geoid, 'PCT_OWN_OCC_HU'].values[0],
+                      selected_df.loc[selected_df['NAMELSAD10'] == geoid, 'SOCIOECON_DISADV_SCORE'].values[0],
+                      selected_df.loc[selected_df['NAMELSAD10'] == geoid,'HEALTH_DISADV_SCORE'].values[0],
+                       selected_df.loc[selected_df['NAMELSAD10'] == geoid,'PCT_BACHELOR_DEGREE_OR_HIGHER'].values[0]],
+                    theta=["% GRAPI >30", "% Owner Occupied Houses","Socioeconomic Disadvantage","Health Disadvantage", "% Bachelor or Higher"],
+                    fill='toself',
+                    name="",
+                    showlegend=False,opacity=0.5
+                ))
+        else:
+            # If no data is available for the selected district(s), show an empty radar chart
+            fig.go.Figure()
+        if selected_geoids:
+            selected_df = df_degree[df_degree['NAMELSAD10'].isin(selected_geoids)]
+
+
+        # Add a single point to the box plot for each selected district
+            for i, district_geoid in enumerate(selected_geoids):
+                district_data = merged_df[merged_df['NAMELSAD10'] == district_geoid]
+                #color = colors[i]
+
+                # Create a trace for all factors within the selected district
+                factor_trace = go.Scatter(
+                    x=factors,
+                    y=district_data[factors].values[0],
+                    mode='markers',
+                    marker=dict(color='red', size=4),
+                    text = '',
+                    name = '',
+                    hovertemplate =str(district_geoid),  showlegend=False)
+
+
+                fig_box_education.add_trace(factor_trace)
+   
+    fig.update_layout(
+        font_size=10,font_family='Optima',
+        polar=dict(radialaxis=dict(visible=True)),
+        showlegend=True,
+        width=450,
+        height=300,
+        margin={"r": 0, "t": 50, "l": 100, "b": 50},
+        autosize=False
+    )
+    fig.update_polars(radialaxis_range=[0,100])
+    fig_box_education.update_layout(font_size=10,font_family='Optima',title_font_size=16, legend_font_size=9, title_font_family='Optima',
+                         width=500, height=300, margin={"r": 0, "t": 50, "l": 0, "b": 0})
+    return fig, fig_box_education
+
+
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=False)
